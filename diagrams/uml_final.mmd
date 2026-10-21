@@ -1,0 +1,41 @@
+classDiagram
+    class Owner {
+        +str name
+        +str preferences
+        +list~Pet~ pets
+        +__post_init__()
+        +add_pet(pet)
+    }
+    class Pet {
+        +str name
+        +str species
+        +list~Task~ tasks
+        +__post_init__()
+        +add_task(task)
+    }
+    class Task {
+        +str title
+        +str time
+        +date due_date
+        +int duration_minutes
+        +str priority
+        +str frequency
+        +bool completed
+        +str task_id
+        +__post_init__()
+    }
+    class Scheduler {
+        +Owner owner
+        +__init__(owner)
+        +filter_tasks(pet_name, completed, day) list
+        +sort_by_time(tasks) list
+        +detect_conflicts(tasks) list
+        +mark_task_complete(pet, task) Task
+        +update_task(pet, task, changes) Task
+        +build_schedule(day, available_minutes, pet_name) tuple
+    }
+    Owner "1" o-- "0..*" Pet : registers
+    Pet "1" *-- "0..*" Task : stores
+    Scheduler --> Owner : reads
+    Scheduler ..> Pet : accesses tasks
+    Scheduler ..> Task : validates edits and creates recurrence

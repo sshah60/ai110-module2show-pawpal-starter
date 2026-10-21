@@ -1,5 +1,7 @@
-__pycache__/
 .venv/
-.venv_new/
+__pycache__/
 .pytest_cache/
+*.pyc
 .DS_Store
+
+.venv_new/

@@ -1,71 +1,57 @@
 # PawPal+ Project Reflection
 
+This reflection describes the AI-assisted work in this project. Personal learning claims are left for the student to verify.
+
 ## 1. System Design
 
 **a. Initial design**
 
-- Briefly describe your initial UML design.
-- What classes did you include, and what responsibilities did you assign to each?
+The baseline design uses Owner, Pet, Task, and Scheduler. Owners register pets, pets store tasks, and the scheduler selects and orders care.
 
 **b. Design changes**
 
-- Did your design change during implementation?
-- If yes, describe at least one change and why you made it.
-
----
+The final design adds validated edits, stable task IDs, conflict warnings, and recurrence. The draft diagram records the baseline design for comparison; it was saved during final documentation rather than before coding.
 
 ## 2. Scheduling Logic and Tradeoffs
 
 **a. Constraints and priorities**
 
-- What constraints does your scheduler consider (for example: time, priority, preferences)?
-- How did you decide which constraints mattered most?
+The scheduler considers date, completion status, priority, and available care minutes. It chooses high-priority tasks first, then displays chosen tasks chronologically. Owner preferences are notes only.
 
 **b. Tradeoffs**
 
-- Describe one tradeoff your scheduler makes.
-- Why is that tradeoff reasonable for this scenario?
-
----
+Conflicts mean identical start dates and times, not overlapping durations. This keeps the logic simple but can miss partial overlaps. The greedy budget rule is easy to explain but does not guarantee the best possible combination.
 
 ## 3. AI Collaboration
 
 **a. How you used AI**
 
-- How did you use AI tools during this project (for example: design brainstorming, debugging, refactoring)?
-- What kinds of prompts or questions were most helpful?
+Codex inspected the starter, implemented the classes and UI, wrote tests, and ran the CLI and app checks. The request to keep beginner-friendly code and real test output guided the work. Separate phase chats were not used; phases stayed organized through separate files and checks.
 
 **b. Judgment and verification**
 
-- Describe one moment where you did not accept an AI suggestion as-is.
-- How did you evaluate or verify what the AI suggested?
-
----
+The first UI version stored selected Pet objects directly in widgets. App tests showed that tasks could be added to a detached copy. The implementation was revised to select pet names and task IDs, then look up the current objects. This was an agent correction, not a claimed student rejection.
 
 ## 4. Testing and Verification
 
 **a. What you tested**
 
-- What behaviors did you test?
-- Why were these tests important?
+Tests cover sorting, combined filters, budgets, empty schedules, validation, editing, conflicts, and daily/weekly recurrence. App tests cover forms, session persistence, completion, filters, and warnings.
 
 **b. Confidence**
 
-- How confident are you that your scheduler works correctly?
-- What edge cases would you test next if you had more time?
-
----
+Confidence: 4/5 for this in-memory prototype, based on the successful run recorded in README. Next tests would cover duration overlaps, time zones, and long-term storage.
 
 ## 5. Reflection
 
 **a. What went well**
 
-- What part of this project are you most satisfied with?
+The CLI and UI share one scheduling layer, so both use the same rules.
 
 **b. What you would improve**
 
-- If you had another iteration, what would you improve or redesign?
+Add persistent storage and duration-aware conflicts. Make owner preferences structured so the scheduler can apply them.
 
 **c. Key takeaway**
 
-- What is one important thing you learned about designing systems or working with AI on this project?
+The lead architect must define the rules and verify behavior. AI-generated code still needs tests; a success message alone does not prove data was saved.

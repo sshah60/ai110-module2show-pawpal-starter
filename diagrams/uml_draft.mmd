@@ -1,0 +1,33 @@
+classDiagram
+    %% Baseline four-class design; retained for comparison with final design.
+    class Owner {
+        +str name
+        +str preferences
+        +list pets
+        +add_pet(pet)
+    }
+    class Pet {
+        +str name
+        +str species
+        +list tasks
+        +add_task(task)
+    }
+    class Task {
+        +str title
+        +str time
+        +date due_date
+        +int duration_minutes
+        +str priority
+        +str frequency
+        +bool completed
+    }
+    class Scheduler {
+        +Owner owner
+        +sort_by_time(tasks)
+        +filter_tasks(pet_name, completed, day)
+        +build_schedule(day, available_minutes, pet_name)
+    }
+    Owner "1" o-- "0..*" Pet : registers
+    Pet "1" *-- "0..*" Task : stores
+    Scheduler --> Owner : reads
+    Scheduler ..> Task : selects and orders

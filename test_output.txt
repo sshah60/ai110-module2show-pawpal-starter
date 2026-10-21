@@ -1,0 +1,10 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.13.15, pytest-9.1.1, pluggy-1.7.0
+rootdir: /Users/shrey/Desktop/ai110-module2show-pawpal-starter
+plugins: anyio-4.15.1
+collected 20 items
+
+tests/test_app.py ..                                                     [ 10%]
+tests/test_pawpal.py ..................                                  [100%]
+
+============================== 20 passed in 4.97s ==============================
