@@ -14,7 +14,7 @@ def main():
     luna.add_task(Task("Medication", "08:00", day, 5, "high", "daily"))
     luna.add_task(Task("Brush coat", "09:00", day, 15, "medium", "weekly"))
     scheduler = Scheduler(owner)
-    print(f"PawPal+ daily plan for {owner.name}: {day} (30 minute budget)")
+    print(f"Today's Schedule for {owner.name}: {day} (30 minute budget)")
     chosen, skipped = scheduler.build_schedule(day, 30)
     for pet, task, reason in chosen:
         print(f"{task.time} | {pet.name} | {task.title} | {reason}")
@@ -22,6 +22,7 @@ def main():
         print(f"Skipped: {pet.name} / {task.title} (does not fit remaining budget)")
     for warning in scheduler.detect_conflicts():
         print(f"WARNING: {warning}")
+    print(f"Owner combined task count: {len(owner.get_all_tasks())}")
     print("Mochi tasks (chronological):")
     for pet, task in scheduler.sort_by_time(scheduler.filter_tasks(pet_name="Mochi")):
         print(f"  {task.time} {task.title}")

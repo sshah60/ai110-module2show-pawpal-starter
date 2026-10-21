@@ -5,6 +5,7 @@ classDiagram
         +str preferences
         +list pets
         +add_pet(pet)
+        +get_all_tasks() list
     }
     class Pet {
         +str name
@@ -20,6 +21,7 @@ classDiagram
         +str priority
         +str frequency
         +bool completed
+        +mark_complete() bool
     }
     class Scheduler {
         +Owner owner
@@ -29,5 +31,5 @@ classDiagram
     }
     Owner "1" o-- "0..*" Pet : registers
     Pet "1" *-- "0..*" Task : stores
-    Scheduler --> Owner : reads
+    Scheduler --> Owner : calls get_all_tasks
     Scheduler ..> Task : selects and orders

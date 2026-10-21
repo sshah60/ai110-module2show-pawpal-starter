@@ -16,6 +16,7 @@ class Task:
     task_id: str = field(default_factory=lambda: uuid4().hex)
 
     def __post_init__(self):
+        """Validate task details and normalize its time."""
         if not self.title.strip():
             raise ValueError("Task title is required.")
         try:
@@ -33,6 +34,14 @@ class Task:
             raise ValueError("Frequency must be once, daily, or weekly.")
 
 
+    def mark_complete(self):
+        """Set completion status and report whether it changed."""
+        if self.completed:
+            return False
+        self.completed = True
+        return True
+
+
 @dataclass(eq=False)
 class Pet:
     name: str
@@ -40,10 +49,12 @@ class Pet:
     tasks: list[Task] = field(default_factory=list)
 
     def __post_init__(self):
+        """Require basic pet details."""
         if not self.name.strip() or not self.species.strip():
             raise ValueError("Pet name and species are required.")
 
     def add_task(self, task):
+        """Register a task once for this pet."""
         if any(item.task_id == task.task_id for item in self.tasks):
             raise ValueError("This task is already registered.")
         self.tasks.append(task)
@@ -56,31 +67,42 @@ class Owner:
     pets: list[Pet] = field(default_factory=list)
 
     def __post_init__(self):
+        """Require an owner name."""
         if not self.name.strip():
             raise ValueError("Owner name is required.")
 
     def add_pet(self, pet):
+        """Register a pet with a unique name."""
         if any(item.name.casefold() == pet.name.casefold() for item in self.pets):
             raise ValueError("Choose a unique pet name.")
         self.pets.append(pet)
 
 
+    def get_all_tasks(self):
+        """Return (pet, task) pairs across every registered pet."""
+        result = []
+        for pet in self.pets:
+            for task in pet.tasks:
+                result.append((pet, task))
+        return result
+
+
 class Scheduler:
     def __init__(self, owner):
+        """Connect the scheduler to one owner and all their pets."""
         self.owner = owner
 
     def filter_tasks(self, pet_name=None, completed=None, day=None):
         """Return (pet, task) pairs matching all supplied filters."""
         result = []
-        for pet in self.owner.pets:
-            for task in pet.tasks:
-                if pet_name is not None and pet.name != pet_name:
-                    continue
-                if completed is not None and task.completed != completed:
-                    continue
-                if day is not None and task.due_date != day:
-                    continue
-                result.append((pet, task))
+        for pet, task in self.owner.get_all_tasks():
+            if pet_name is not None and pet.name != pet_name:
+                continue
+            if completed is not None and task.completed != completed:
+                continue
+            if day is not None and task.due_date != day:
+                continue
+            result.append((pet, task))
         return result
 
     def sort_by_time(self, tasks=None):
@@ -110,9 +132,8 @@ class Scheduler:
         """Complete once and create one next occurrence from its scheduled date."""
         if pet not in self.owner.pets or task not in pet.tasks:
             raise ValueError("Task must belong to a registered pet.")
-        if task.completed:
+        if not task.mark_complete():
             return None
-        task.completed = True
         days = {"daily": 1, "weekly": 7}.get(task.frequency)
         if days is None:
             return None

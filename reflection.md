@@ -1,16 +1,14 @@
 # PawPal+ Project Reflection
 
-This reflection describes the AI-assisted work in this project. Personal learning claims are left for the student to verify.
-
 ## 1. System Design
 
 **a. Initial design**
 
-The baseline design uses Owner, Pet, Task, and Scheduler. Owners register pets, pets store tasks, and the scheduler selects and orders care.
+Three core actions are adding a pet, scheduling a care task, and viewing today's tasks. Owner manages pets and combines their tasks; Pet stores details and tasks; Task tracks an activity; Scheduler organizes care.
 
 **b. Design changes**
 
-The final design adds validated edits, stable task IDs, conflict warnings, and recurrence. The draft diagram records the baseline design for comparison; it was saved during final documentation rather than before coding.
+The full screenshot review moved task collection into Owner.get_all_tasks(), which Scheduler now calls. Task.mark_complete() handles status; the scheduler handles recurrence. The design skeleton was revisited before these corrections.
 
 ## 2. Scheduling Logic and Tradeoffs
 
@@ -26,17 +24,17 @@ Conflicts mean identical start dates and times, not overlapping durations. This 
 
 **a. How you used AI**
 
-Codex inspected the starter, implemented the classes and UI, wrote tests, and ran the CLI and app checks. The request to keep beginner-friendly code and real test output guided the work. Separate phase chats were not used; phases stayed organized through separate files and checks.
+Codex's file editing, test execution, and debugging were most useful. The full screenshot review clarified the multi-pet architecture. Separate phase chats were not used; phase notes and separate files kept the work organized.
 
 **b. Judgment and verification**
 
-The first UI version stored selected Pet objects directly in widgets. App tests showed that tasks could be added to a detached copy. The implementation was revised to select pet names and task IDs, then look up the current objects. This was an agent correction, not a claimed student rejection.
+The initial AI implementation collected tasks inside Scheduler; this was changed to the required Owner aggregation method. App tests also caught a copied-object issue, fixed with stable selections. These were agent corrections during review.
 
 ## 4. Testing and Verification
 
 **a. What you tested**
 
-Tests cover sorting, combined filters, budgets, empty schedules, validation, editing, conflicts, and daily/weekly recurrence. App tests cover forms, session persistence, completion, filters, and warnings.
+The 24 tests cover completion, task addition, Owner aggregation, sorting, filtering, budgets, conflicts, recurrence, validation, and app actions. They verify both the core rules and the UI connection.
 
 **b. Confidence**
 

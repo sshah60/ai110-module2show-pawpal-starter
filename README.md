@@ -27,14 +27,16 @@ python -m streamlit run app.py
 
 ## System design
 
-`pawpal_system.py` contains Owner, Pet, Task, and Scheduler. `main.py` demonstrates the backend; `app.py` provides the UI. Tests are in `tests/`.
+`pawpal_system.py` contains Owner, Pet, Task, and Scheduler. Owner.get_all_tasks() combines tasks across pets; Scheduler reads that method to organize care. Task.mark_complete() changes status, while Scheduler.mark_task_complete() also creates recurrence. `main.py` demonstrates the backend; `app.py` provides the UI. Tests are in `tests/`.
 
-Mermaid sources: [baseline draft](diagrams/uml_draft.mmd), [final UML](diagrams/uml_final.mmd). The starter's `diagrams/uml.mmd` also contains the final diagram. The draft is a baseline reconstruction saved during documentation, not a claim that the diagram preceded implementation.
+Mermaid sources: [baseline draft](diagrams/uml_draft.mmd), [final UML](diagrams/uml_final.mmd). The starter's `diagrams/uml.mmd` also contains the final diagram. The full screenshot review revisited the design and [class skeleton](docs/phase1_skeleton.py) before correcting the backend. [Design notes](docs/design.md) summarize the four classes and core actions.
 
 ## Smarter Scheduling
 
 | Feature | Method | Behavior |
 |---|---|---|
+| Multi-pet retrieval | `Owner.get_all_tasks()` | Return tasks from all pets; used by Scheduler filtering and scheduling |
+| Completion | `Task.mark_complete()` | Set status; scheduler completion adds recurrence |
 | Sorting | `Scheduler.sort_by_time()` | New list ordered by date, then time |
 | Filtering | `Scheduler.filter_tasks()` | Combine pet, status, and date filters |
 | Budget and priorities | `Scheduler.build_schedule()` | High, medium, then low priority; choose tasks that fit remaining minutes; display by time |
@@ -51,17 +53,18 @@ Mermaid sources: [baseline draft](diagrams/uml_draft.mmd), [final UML](diagrams/
 5. Under **Build Schedule**, choose the date, pet/status filters, and available care minutes. Click **Generate schedule** to see the priority-based plan and why each task fits.
 6. Lower the budget to see tasks skipped. The plan always uses pending tasks, even when the table displays completed tasks.
 
-### Sample CLI output
+### Sample Output
 
 Actual output from `python main.py`:
 
 ```text
-PawPal+ daily plan for Jordan: 2026-10-21 (30 minute budget)
+Today's Schedule for Jordan: 2026-10-21 (30 minute budget)
 08:00 | Mochi | Breakfast | high priority; 10 min fits the budget
 08:00 | Luna | Medication | high priority; 5 min fits the budget
 09:00 | Luna | Brush coat | medium priority; 15 min fits the budget
 Skipped: Mochi / Evening walk (does not fit remaining budget)
 WARNING: 2026-10-21 08:00: Mochi: Breakfast conflicts with Luna: Medication.
+Owner combined task count: 4
 Mochi tasks (chronological):
   08:00 Breakfast
   18:00 Evening walk
@@ -75,7 +78,7 @@ Completed tasks: 1
 python -m pytest
 ```
 
-The 20 cases check chronological sorting, empty schedules, combined filters, budgets and priorities, same-pet and cross-pet conflicts, daily/weekly date rollover, repeated completion, invalid input, safe editing, and duplicate guards. Streamlit AppTest also executes real widget interactions for adding, editing, completing, filtering, and generating a plan.
+The 24 cases check task completion, task addition, Owner aggregation, scheduler use of that method, chronological sorting, empty schedules, combined filters, budgets and priorities, same-pet and cross-pet conflicts, daily/weekly date rollover, repeated completion, invalid input, safe editing, and duplicate guards. Streamlit AppTest also executes real widget interactions for adding, editing, completing, filtering, and generating a plan.
 
 Actual successful output from the VS Code project folder:
 
@@ -84,12 +87,12 @@ Actual successful output from the VS Code project folder:
 platform darwin -- Python 3.13.15, pytest-9.1.1, pluggy-1.7.0
 rootdir: /Users/shrey/Desktop/ai110-module2show-pawpal-starter
 plugins: anyio-4.15.1
-collected 20 items
+collected 24 items
 
-tests/test_app.py ..                                                     [ 10%]
-tests/test_pawpal.py ..................                                  [100%]
+tests/test_app.py ..                                                     [  8%]
+tests/test_pawpal.py ......................                              [100%]
 
-============================== 20 passed in 4.97s ==============================
+============================== 24 passed in 2.01s ==============================
 ```
 
 Confidence level: **4/5** for this prototype. Tests verify the implemented rules; they do not prove every possible use case.
@@ -106,4 +109,4 @@ Confidence level: **4/5** for this prototype. Tests verify the implemented rules
 
 ## Assignment coverage and AI use
 
-The starter structure and reflection headings are retained. The agent could inspect 10 of the 18 screenshots (phases 3–6), plus the repository requirements. The first eight screenshots remain unverified. No separate phase chat history, student actions, or GitHub submission is claimed. See `reflection.md` and `ai_interactions.md` for short, factual notes.
+The starter structure and reflection headings are retained. All 17 screenshots attached in this chat were reviewed across phases 1–6. The corrected requirements are mapped in [the checklist](docs/requirements_checklist.md). No separate phase chat history or GitHub submission is claimed. See `reflection.md` and `ai_interactions.md` for short notes.

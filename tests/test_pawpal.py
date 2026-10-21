@@ -147,3 +147,51 @@ def test_membership_and_duplicate_guards(system):
     pet.add_task(task)
     with pytest.raises(ValueError):
         pet.add_task(task)
+
+
+def test_task_mark_complete_changes_status():
+    task = Task("Food", "08:00", DAY)
+    assert task.completed is False
+    assert task.mark_complete() is True
+    assert task.completed is True
+    assert task.mark_complete() is False
+
+
+def test_pet_add_task_increases_count():
+    pet = Pet("Mochi", "dog")
+    before = len(pet.tasks)
+    task = Task("Walk", "08:00", DAY)
+    pet.add_task(task)
+    assert len(pet.tasks) == before + 1
+    assert pet.tasks[0] is task
+
+
+def test_owner_collects_every_pets_tasks(system):
+    owner, dog, _ = system
+    cat = Pet("Luna", "cat")
+    owner.add_pet(cat)
+    dog_task = Task("Walk", "09:00", DAY)
+    cat_task = Task("Meds", "08:00", DAY)
+    dog.add_task(dog_task)
+    cat.add_task(cat_task)
+    assert owner.get_all_tasks() == [(dog, dog_task), (cat, cat_task)]
+
+
+def test_scheduler_reads_owner_aggregation_method():
+    class TrackingOwner(Owner):
+        calls = 0
+
+        def get_all_tasks(self):
+            self.calls += 1
+            return super().get_all_tasks()
+
+    owner = TrackingOwner("Jordan")
+    dog, cat = Pet("Mochi", "dog"), Pet("Luna", "cat")
+    for pet in [dog, cat]:
+        owner.add_pet(pet)
+        pet.add_task(Task("Food", "08:00", DAY))
+    scheduler = Scheduler(owner)
+    assert len(scheduler.filter_tasks()) == 2
+    assert owner.calls == 1
+    assert len(scheduler.detect_conflicts()) == 1
+    assert owner.calls == 2

@@ -1,9 +1,10 @@
-PawPal+ daily plan for Jordan: 2026-10-21 (30 minute budget)
+Today's Schedule for Jordan: 2026-10-21 (30 minute budget)
 08:00 | Mochi | Breakfast | high priority; 10 min fits the budget
 08:00 | Luna | Medication | high priority; 5 min fits the budget
 09:00 | Luna | Brush coat | medium priority; 15 min fits the budget
 Skipped: Mochi / Evening walk (does not fit remaining budget)
 WARNING: 2026-10-21 08:00: Mochi: Breakfast conflicts with Luna: Medication.
+Owner combined task count: 4
 Mochi tasks (chronological):
   08:00 Breakfast
   18:00 Evening walk
