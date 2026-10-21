@@ -126,6 +126,7 @@ Confidence level: **4/5** for this prototype. Tests verify the implemented rules
 - Preferences are stored as notes and are not interpreted automatically.
 - Recurrence advances from the completion date: daily is tomorrow, weekly is seven days later.
 - One owner per session; no accounts, time zones, or database.
+- Free-slot search uses stored pending occurrences only. Future recurring instances are created on completion, not expanded automatically through a search horizon.
 
 ## Optional extensions
 
@@ -149,7 +150,7 @@ The app uses `st.metric()` for pet/pending/completed totals, status symbols (✅
 
 ### 5. Prompt comparison
 
-A comparison template and the actual current-session approach are in `ai_interactions.md`. A genuine second-model response is still needed; this extension is not claimed complete.
+`ai_interactions.md` compares the implemented interval sweep with a user-supplied Claude response. Claude's example was executed successfully. The log records useful ideas, limitations, verification, and the decision to retain validated same-day results. Exact model versions were not provided.
 
 Modified files: `pawpal_system.py`, `app.py`, `main.py`, `tests/test_app.py`, `tests/test_extensions.py`, both final UML sources, `.gitignore`, `README.md`, `reflection.md`, and `ai_interactions.md`.
 

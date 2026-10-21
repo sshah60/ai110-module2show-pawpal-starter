@@ -38,4 +38,4 @@ Reviewed against all 17 screenshots supplied directly in this chat. They cover t
 - JSON persistence: save/load methods plus app controls and tests.
 - Priority scheduling: explicit priority-first ordering and CLI example.
 - Professional formatting: metrics, status symbols, notices, and CLI columns.
-- Two-model comparison: pending an actual second-model response; not claimed complete.
+- Two-model comparison: current implementation compared with user-confirmed Claude response; supplied example executed, tradeoffs and decision recorded in ai_interactions.md.
