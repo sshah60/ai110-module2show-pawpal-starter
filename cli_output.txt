@@ -2,11 +2,24 @@ Today's Schedule for Jordan: 2026-10-21 (30 minute budget)
 08:00 | Mochi | Breakfast | high priority; 10 min fits the budget
 08:00 | Luna | Medication | high priority; 5 min fits the budget
 09:00 | Luna | Brush coat | medium priority; 15 min fits the budget
+Skipped: Mochi / Early play (does not fit remaining budget)
 Skipped: Mochi / Evening walk (does not fit remaining budget)
 WARNING: 2026-10-21 08:00: Mochi: Breakfast conflicts with Luna: Medication.
-Owner combined task count: 4
+Owner combined task count: 5
 Mochi tasks (chronological):
+  07:00 Early play
   08:00 Breakfast
   18:00 Evening walk
+
+PRIORITY QUEUE (priority first, then time)
+PRIORITY   TIME   PET      TASK
+------------------------------------------------
+HIGH       08:00  Mochi    Breakfast
+HIGH       08:00  Luna     Medication
+MEDIUM     09:00  Luna     Brush coat
+LOW        07:00  Mochi    Early play
+LOW        18:00  Mochi    Evening walk
+Next free 20-minute slot after 08:00: 08:10
+JSON round trip: 2 pets, 5 tasks restored
 Completed Breakfast; next daily occurrence: 2026-10-22 08:00
 Completed tasks: 1

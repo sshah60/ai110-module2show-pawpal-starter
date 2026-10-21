@@ -1,8 +1,14 @@
 """Exercise actual Streamlit widgets and reruns without needing a browser."""
 from pathlib import Path
+import pytest
 from streamlit.testing.v1 import AppTest
 
 APP = Path(__file__).resolve().parents[1] / "app.py"
+
+
+@pytest.fixture(autouse=True)
+def isolated_saved_data(tmp_path, monkeypatch):
+    monkeypatch.setenv("PAWPAL_DATA_FILE", str(tmp_path / "data.json"))
 
 
 def widget(elements, label):
@@ -58,3 +64,18 @@ def test_duplicate_pet_and_cross_pet_conflict_warning():
     widget(app.number_input, "Available care minutes").set_value(0)
     click(app, "Generate schedule")
     assert any("No pending task fits" in item.value for item in app.info)
+
+
+def test_save_load_across_sessions_and_find_slot():
+    app = AppTest.from_file(str(APP), default_timeout=20).run()
+    widget(app.text_input, "Pet name").set_value("Mochi")
+    click(app, "Add pet")
+    widget(app.text_input, "Task title").set_value("Walk")
+    click(app, "Add task")
+    click(app, "Save data")
+    another_session = AppTest.from_file(str(APP), default_timeout=20).run()
+    assert not another_session.exception
+    assert another_session.session_state.owner.pets[0].name == "Mochi"
+    assert len(another_session.session_state.owner.pets[0].tasks) == 1
+    click(another_session, "Find free slot")
+    assert any("08:20" in message.value for message in another_session.success)

@@ -1,17 +1,33 @@
 """Streamlit interface. All scheduling rules live in pawpal_system.py."""
 from datetime import date, datetime
+import os
+from pathlib import Path
 import streamlit as st
 from pawpal_system import Owner, Pet, Task, Scheduler
 
 st.set_page_config(page_title="PawPal+", page_icon="🐾", layout="centered")
 st.title("🐾 PawPal+")
 st.markdown("Plan care for every pet, track completion, and spot scheduling conflicts.")
-st.caption("Data stays during this browser session. A new session starts empty.")
+st.caption("Use Save data to keep pets and tasks between runs.")
+data_path = Path(os.environ.get("PAWPAL_DATA_FILE", str(Path(__file__).with_name("data.json"))))
 
 if "owner" not in st.session_state:
-    st.session_state.owner = Owner("Jordan")
+    try:
+        st.session_state.owner = Owner.load_from_json(data_path) if data_path.exists() else Owner("Jordan")
+    except (ValueError, OSError) as error:
+        st.error(f"Could not load saved data: {error}. The file has not been changed.")
+        st.session_state.owner = Owner("Jordan")
 owner = st.session_state.owner
 scheduler = Scheduler(owner)
+with st.expander("Saved data"):
+    st.caption("Save after making changes. Saved data loads automatically on the next run.")
+    if st.button("Save data"):
+        try:
+            owner.save_to_json(data_path)
+            st.success("Pets and tasks saved to data.json.")
+        except OSError as error:
+            st.error(f"Could not save: {error}")
+
 
 with st.expander("Owner and preferences", expanded=True):
     with st.form("owner_form"):
@@ -91,6 +107,11 @@ if pending:
 if "notice" in st.session_state:
     st.success(st.session_state.pop("notice"))
 
+left, middle, right = st.columns(3)
+left.metric("Pets", len(owner.pets))
+middle.metric("Pending tasks", len(scheduler.filter_tasks(completed=False)))
+right.metric("Completed tasks", len(scheduler.filter_tasks(completed=True)))
+
 st.divider()
 st.subheader("Build Schedule")
 view_day = st.date_input("Schedule date", value=date.today())
@@ -104,7 +125,7 @@ rows = scheduler.sort_by_time(scheduler.filter_tasks(name_filter, completed_filt
 if rows:
     st.table([{"Pet": pet.name, "Task": task.title, "Date": str(task.due_date), "Time": task.time,
                "Minutes": task.duration_minutes, "Priority": task.priority,
-               "Frequency": task.frequency, "Done": task.completed} for pet, task in rows])
+               "Frequency": task.frequency, "Status": "✅ Complete" if task.completed else "🕒 Pending"} for pet, task in rows])
 else:
     st.info("No tasks match these filters.")
 
@@ -128,3 +149,16 @@ if st.session_state.get("show_schedule", False):
         st.info("No pending task fits this day and budget.")
     for pet, task in skipped:
         st.info(f"Skipped {pet.name}: {task.title} — does not fit the remaining care-minute budget.")
+
+
+with st.expander("Find the next available slot"):
+    st.caption("Checks task durations across every pet. Completed tasks do not block time.")
+    slot_day = st.date_input("Slot date", value=date.today())
+    slot_duration = st.number_input("Slot duration (minutes)", min_value=1, max_value=1440, value=20)
+    slot_start = st.time_input("Start searching at", value=datetime.strptime("08:00", "%H:%M").time())
+    if st.button("Find free slot"):
+        result = scheduler.next_available_slot(slot_day, int(slot_duration), slot_start.strftime("%H:%M"))
+        if result is None:
+            st.warning("No free slot of that length remains on this day.")
+        else:
+            st.success(f"Next available slot: {slot_day} at {result} for {int(slot_duration)} minutes.")

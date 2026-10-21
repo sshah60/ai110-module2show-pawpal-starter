@@ -1,5 +1,7 @@
 """Deterministic multi-pet demonstration: python main.py."""
 from datetime import date
+from tempfile import TemporaryDirectory
+from pathlib import Path
 from pawpal_system import Owner, Pet, Task, Scheduler
 
 
@@ -13,6 +15,7 @@ def main():
     mochi.add_task(Task("Breakfast", "08:00", day, 10, "high", "daily"))
     luna.add_task(Task("Medication", "08:00", day, 5, "high", "daily"))
     luna.add_task(Task("Brush coat", "09:00", day, 15, "medium", "weekly"))
+    mochi.add_task(Task("Early play", "07:00", day, 10, "low"))
     scheduler = Scheduler(owner)
     print(f"Today's Schedule for {owner.name}: {day} (30 minute budget)")
     chosen, skipped = scheduler.build_schedule(day, 30)
@@ -26,6 +29,17 @@ def main():
     print("Mochi tasks (chronological):")
     for pet, task in scheduler.sort_by_time(scheduler.filter_tasks(pet_name="Mochi")):
         print(f"  {task.time} {task.title}")
+    print("\nPRIORITY QUEUE (priority first, then time)")
+    print(f"{'PRIORITY':<10} {'TIME':<6} {'PET':<8} TASK")
+    print("-" * 48)
+    for pet, task in scheduler.sort_by_priority():
+        print(f"{task.priority.upper():<10} {task.time:<6} {pet.name:<8} {task.title}")
+    print(f"Next free 20-minute slot after 08:00: {scheduler.next_available_slot(day, 20)}")
+    with TemporaryDirectory() as folder:
+        path = Path(folder) / "data.json"
+        owner.save_to_json(path)
+        restored = Owner.load_from_json(path)
+        print(f"JSON round trip: {len(restored.pets)} pets, {len(restored.get_all_tasks())} tasks restored")
     next_task = scheduler.mark_task_complete(mochi, mochi.tasks[1], completion_date=day)
     print(f"Completed Breakfast; next daily occurrence: {next_task.due_date} {next_task.time}")
     print(f"Completed tasks: {len(scheduler.filter_tasks(completed=True))}")

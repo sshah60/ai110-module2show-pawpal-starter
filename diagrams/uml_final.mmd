@@ -6,6 +6,8 @@ classDiagram
         +__post_init__()
         +add_pet(pet)
         +get_all_tasks() list
+        +save_to_json(path)
+        +load_from_json(path) Owner
     }
     class Pet {
         +str name
@@ -31,6 +33,8 @@ classDiagram
         +__init__(owner)
         +filter_tasks(pet_name, completed, day) list
         +sort_by_time(tasks) list
+        +sort_by_priority(tasks) list
+        +next_available_slot(day, duration_minutes, earliest) str
         +detect_conflicts(tasks) list
         +mark_task_complete(pet, task, completion_date) Task
         +update_task(pet, task, changes) Task

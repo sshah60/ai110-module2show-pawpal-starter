@@ -2,9 +2,10 @@
 platform darwin -- Python 3.13.15, pytest-9.1.1, pluggy-1.7.0
 rootdir: /Users/shrey/Desktop/ai110-module2show-pawpal-starter
 plugins: anyio-4.15.1
-collected 27 items
+collected 36 items
 
-tests/test_app.py ..                                                     [  7%]
+tests/test_app.py ...                                                    [  8%]
+tests/test_extensions.py ........                                        [ 30%]
 tests/test_pawpal.py .........................                           [100%]
 
-============================== 27 passed in 2.23s ==============================
+============================== 36 passed in 2.90s ==============================

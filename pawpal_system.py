@@ -1,5 +1,7 @@
-"""Small, in-memory pet care model shared by the CLI and Streamlit UI."""
-from dataclasses import dataclass, field, replace
+"""Pet care model, JSON storage, and scheduling shared by the CLI and UI."""
+from dataclasses import asdict, dataclass, field, replace
+import json
+from pathlib import Path
 from datetime import date, datetime, timedelta
 from uuid import uuid4
 
@@ -87,6 +89,42 @@ class Owner:
         return result
 
 
+    def save_to_json(self, path="data.json"):
+        """Save all pets/tasks using ISO dates and an atomic file replacement."""
+        payload = asdict(self)
+        for pet in payload["pets"]:
+            for task in pet["tasks"]:
+                task["due_date"] = task["due_date"].isoformat()
+        destination = Path(path)
+        temporary = destination.with_suffix(destination.suffix + ".tmp")
+        temporary.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+        temporary.replace(destination)
+
+    @classmethod
+    def load_from_json(cls, path="data.json"):
+        """Rebuild a validated owner graph from JSON without changing the file."""
+        try:
+            payload = json.loads(Path(path).read_text(encoding="utf-8"))
+            owner = cls(payload["name"], payload.get("preferences", ""))
+            seen_ids = set()
+            for pet_data in payload["pets"]:
+                pet = Pet(pet_data["name"], pet_data["species"])
+                owner.add_pet(pet)
+                for task_data in pet_data["tasks"]:
+                    details = dict(task_data)
+                    details["due_date"] = date.fromisoformat(details["due_date"])
+                    task = Task(**details)
+                    if not isinstance(task.completed, bool):
+                        raise ValueError("Completion status must be true or false.")
+                    if not isinstance(task.task_id, str) or not task.task_id or task.task_id in seen_ids:
+                        raise ValueError("Task IDs must be unique nonempty strings.")
+                    seen_ids.add(task.task_id)
+                    pet.add_task(task)
+            return owner
+        except (KeyError, TypeError, AttributeError, ValueError) as error:
+            raise ValueError(f"Invalid PawPal data: {error}") from error
+
+
 class Scheduler:
     def __init__(self, owner):
         """Connect the scheduler to one owner and all their pets."""
@@ -110,6 +148,36 @@ class Scheduler:
         if tasks is None:
             tasks = self.filter_tasks()
         return sorted(tasks, key=lambda pair: (pair[1].due_date, pair[1].time))
+
+    def sort_by_priority(self, tasks=None):
+        """Order high, medium, low priority first, then date and time."""
+        if tasks is None:
+            tasks = self.filter_tasks(completed=False)
+        rank = {"high": 0, "medium": 1, "low": 2}
+        return sorted(tasks, key=lambda pair: (rank[pair[1].priority], pair[1].due_date, pair[1].time))
+
+    def next_available_slot(self, day, duration_minutes, earliest="08:00"):
+        """Find a same-day free interval across all pets, including overnight tasks."""
+        if not isinstance(duration_minutes, int) or duration_minutes <= 0:
+            raise ValueError("Duration must be positive whole minutes.")
+        try:
+            start_time = datetime.strptime(earliest, "%H:%M").time()
+        except (TypeError, ValueError):
+            raise ValueError("Earliest time must use HH:MM.") from None
+        candidate = datetime.combine(day, start_time)
+        duration = timedelta(minutes=duration_minutes)
+        day_end = datetime.combine(day + timedelta(days=1), datetime.min.time())
+        for pet, task in self.sort_by_time(self.filter_tasks(completed=False)):
+            start = datetime.combine(task.due_date, datetime.strptime(task.time, "%H:%M").time())
+            end = start + timedelta(minutes=task.duration_minutes)
+            if end <= candidate:
+                continue
+            if candidate + duration <= start:
+                break
+            candidate = end
+        if candidate + duration > day_end:
+            return None
+        return candidate.strftime("%H:%M")
 
     def detect_conflicts(self, tasks=None):
         """Warn about identical date/time slots across all pets, ignoring done tasks."""
@@ -165,9 +233,8 @@ class Scheduler:
         """
         if available_minutes < 0:
             raise ValueError("Available minutes cannot be negative.")
-        rank = {"high": 0, "medium": 1, "low": 2}
         candidates = self.filter_tasks(pet_name=pet_name, completed=False, day=day)
-        candidates = sorted(candidates, key=lambda pair: (rank[pair[1].priority], pair[1].time))
+        candidates = self.sort_by_priority(candidates)
         chosen, skipped = [], []
         remaining = available_minutes
         for pet, task in candidates:

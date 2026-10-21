@@ -32,6 +32,10 @@ Reviewed against all 17 screenshots supplied directly in this chat. They cover t
 - **How can sorting stay readable?** Use sorted() with a date/time key and leave the original list unchanged.
 - **How does recurrence work?** timedelta(days=1) or timedelta(days=7) advances the completion date while preserving the scheduled time.
 
-## Workflow notes
+## Optional extensions
 
-This was a correction of an existing AI-assisted implementation, not a rewritten development history. The design and skeleton were reviewed before backend corrections. Separate phase chats were not created. Local commits record actual changes; remote push remains pending user confirmation. Optional extensions were not required or claimed, apart from documenting the agent workflow.
+- Next-available-slot scheduling: implemented with duration-aware gaps across all pets.
+- JSON persistence: save/load methods plus app controls and tests.
+- Priority scheduling: explicit priority-first ordering and CLI example.
+- Professional formatting: metrics, status symbols, notices, and CLI columns.
+- Two-model comparison: pending an actual second-model response; not claimed complete.
