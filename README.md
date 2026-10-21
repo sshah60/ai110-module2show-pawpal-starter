@@ -41,7 +41,7 @@ Mermaid sources: [baseline draft](diagrams/uml_draft.mmd), [final UML](diagrams/
 | Filtering | `Scheduler.filter_tasks()` | Combine pet, status, and date filters |
 | Budget and priorities | `Scheduler.build_schedule()` | High, medium, then low priority; choose tasks that fit remaining minutes; display by time |
 | Conflicts | `Scheduler.detect_conflicts()` | Warning strings for pending tasks with identical date/time, including different pets |
-| Recurrence | `Scheduler.mark_task_complete()` | Create one new task at scheduled date + 1 or 7 days; repeated completion does not duplicate it |
+| Recurrence | `Scheduler.mark_task_complete()` | Create one new task at completion date + 1 or 7 days; repeated completion does not duplicate it |
 | Editing | `Scheduler.update_task()` | Validate before replacing the task, preserving its ID |
 
 ## Demo Walkthrough
@@ -78,7 +78,7 @@ Completed tasks: 1
 python -m pytest
 ```
 
-The 24 cases check task completion, task addition, Owner aggregation, scheduler use of that method, chronological sorting, empty schedules, combined filters, budgets and priorities, same-pet and cross-pet conflicts, daily/weekly date rollover, repeated completion, invalid input, safe editing, and duplicate guards. Streamlit AppTest also executes real widget interactions for adding, editing, completing, filtering, and generating a plan.
+The 27 cases check task completion, task addition, Owner aggregation, scheduler use of that method, chronological sorting, empty schedules, combined filters, budgets and priorities, same-pet and cross-pet conflicts, daily/weekly date rollover, repeated completion, invalid input, safe editing, and duplicate guards. Streamlit AppTest also executes real widget interactions for adding, editing, completing, filtering, and generating a plan.
 
 Actual successful output from the VS Code project folder:
 
@@ -87,12 +87,12 @@ Actual successful output from the VS Code project folder:
 platform darwin -- Python 3.13.15, pytest-9.1.1, pluggy-1.7.0
 rootdir: /Users/shrey/Desktop/ai110-module2show-pawpal-starter
 plugins: anyio-4.15.1
-collected 24 items
+collected 27 items
 
-tests/test_app.py ..                                                     [  8%]
-tests/test_pawpal.py ......................                              [100%]
+tests/test_app.py ..                                                     [  7%]
+tests/test_pawpal.py .........................                           [100%]
 
-============================== 24 passed in 2.01s ==============================
+============================== 27 passed in 2.23s ==============================
 ```
 
 Confidence level: **4/5** for this prototype. Tests verify the implemented rules; they do not prove every possible use case.
@@ -104,7 +104,7 @@ Confidence level: **4/5** for this prototype. Tests verify the implemented rules
 - The budget is total care minutes, not a continuous availability window. Requested times remain fixed.
 - Selection is greedy by priority, not an optimal packing algorithm.
 - Preferences are stored as notes and are not interpreted automatically.
-- Recurrence advances from the scheduled due date. Completing an overdue task may create another overdue instance.
+- Recurrence advances from the completion date: daily is tomorrow, weekly is seven days later.
 - One owner per session; no accounts, time zones, or database.
 
 ## Assignment coverage and AI use

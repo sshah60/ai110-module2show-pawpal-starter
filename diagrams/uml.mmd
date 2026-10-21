@@ -32,7 +32,7 @@ classDiagram
         +filter_tasks(pet_name, completed, day) list
         +sort_by_time(tasks) list
         +detect_conflicts(tasks) list
-        +mark_task_complete(pet, task) Task
+        +mark_task_complete(pet, task, completion_date) Task
         +update_task(pet, task, changes) Task
         +build_schedule(day, available_minutes, pet_name) tuple
     }

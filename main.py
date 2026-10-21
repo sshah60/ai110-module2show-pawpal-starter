@@ -26,7 +26,7 @@ def main():
     print("Mochi tasks (chronological):")
     for pet, task in scheduler.sort_by_time(scheduler.filter_tasks(pet_name="Mochi")):
         print(f"  {task.time} {task.title}")
-    next_task = scheduler.mark_task_complete(mochi, mochi.tasks[1])
+    next_task = scheduler.mark_task_complete(mochi, mochi.tasks[1], completion_date=day)
     print(f"Completed Breakfast; next daily occurrence: {next_task.due_date} {next_task.time}")
     print(f"Completed tasks: {len(scheduler.filter_tasks(completed=True))}")
 

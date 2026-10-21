@@ -36,14 +36,14 @@ def test_recurrence_rollover_and_idempotent_completion(system, frequency, days):
     _, pet, scheduler = system
     original = Task("Food", "08:00", DAY, frequency=frequency)
     pet.add_task(original)
-    following = scheduler.mark_task_complete(pet, original)
+    following = scheduler.mark_task_complete(pet, original, completion_date=DAY)
     assert original.completed
     assert following.due_date == DAY + timedelta(days=days)
     assert following.time == original.time
     assert following.frequency == frequency
     assert not following.completed
     assert following.task_id != original.task_id
-    assert scheduler.mark_task_complete(pet, original) is None
+    assert scheduler.mark_task_complete(pet, original, completion_date=DAY) is None
     assert len(pet.tasks) == 2
 
 
@@ -195,3 +195,22 @@ def test_scheduler_reads_owner_aggregation_method():
     assert owner.calls == 1
     assert len(scheduler.detect_conflicts()) == 1
     assert owner.calls == 2
+
+
+@pytest.mark.parametrize("frequency,days", [("daily", 1), ("weekly", 7)])
+def test_overdue_recurrence_uses_completion_date(system, frequency, days):
+    _, pet, scheduler = system
+    task = Task("Food", "08:00", DAY - timedelta(days=20), frequency=frequency)
+    pet.add_task(task)
+    following = scheduler.mark_task_complete(pet, task, completion_date=DAY)
+    assert following.due_date == DAY + timedelta(days=days)
+    assert following.time == "08:00"
+
+
+def test_recurrence_defaults_to_today(system):
+    _, pet, scheduler = system
+    today = date.today()
+    task = Task("Food", "08:00", today - timedelta(days=3), frequency="daily")
+    pet.add_task(task)
+    following = scheduler.mark_task_complete(pet, task)
+    assert following.due_date == today + timedelta(days=1)

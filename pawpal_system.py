@@ -128,16 +128,20 @@ class Scheduler:
                 occupied[slot] = label
         return warnings
 
-    def mark_task_complete(self, pet, task):
-        """Complete once and create one next occurrence from its scheduled date."""
+    def mark_task_complete(self, pet, task, completion_date=None):
+        """Complete once; recur one or seven days after the completion date."""
         if pet not in self.owner.pets or task not in pet.tasks:
             raise ValueError("Task must belong to a registered pet.")
+        if completion_date is None:
+            completion_date = date.today()
+        if not isinstance(completion_date, date) or isinstance(completion_date, datetime):
+            raise ValueError("Completion date must be a date.")
         if not task.mark_complete():
             return None
         days = {"daily": 1, "weekly": 7}.get(task.frequency)
         if days is None:
             return None
-        next_task = replace(task, due_date=task.due_date + timedelta(days=days),
+        next_task = replace(task, due_date=completion_date + timedelta(days=days),
                             completed=False, task_id=uuid4().hex)
         pet.add_task(next_task)
         return next_task

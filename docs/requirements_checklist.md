@@ -30,7 +30,7 @@ Reviewed against all 17 screenshots supplied directly in this chat. They cover t
 - **Which method adds a pet?** Owner.add_pet(). Session state retains the owner, and the rerun shows the updated list.
 - **How should a conflict appear?** Use st.warning() with the date, time, pet names, and tasks, then offer editing to fix the time.
 - **How can sorting stay readable?** Use sorted() with a date/time key and leave the original list unchanged.
-- **How does recurrence work?** timedelta(days=1) or timedelta(days=7) advances the scheduled date while preserving the time.
+- **How does recurrence work?** timedelta(days=1) or timedelta(days=7) advances the completion date while preserving the scheduled time.
 
 ## Workflow notes
 

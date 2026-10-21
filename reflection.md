@@ -8,7 +8,7 @@ Three core actions are adding a pet, scheduling a care task, and viewing today's
 
 **b. Design changes**
 
-The full screenshot review moved task collection into Owner.get_all_tasks(), which Scheduler now calls. Task.mark_complete() handles status; the scheduler handles recurrence. The design skeleton was revisited before these corrections.
+The full screenshot review moved task collection into Owner.get_all_tasks(), which Scheduler now calls. Task.mark_complete() handles status; the scheduler handles recurrence from the completion date. The design skeleton was revisited before these corrections.
 
 ## 2. Scheduling Logic and Tradeoffs
 
@@ -34,7 +34,7 @@ The initial AI implementation collected tasks inside Scheduler; this was changed
 
 **a. What you tested**
 
-The 24 tests cover completion, task addition, Owner aggregation, sorting, filtering, budgets, conflicts, recurrence, validation, and app actions. They verify both the core rules and the UI connection.
+The 27 tests cover completion, task addition, Owner aggregation, sorting, filtering, budgets, conflicts, recurrence, validation, and app actions. They verify both the core rules and the UI connection.
 
 **b. Confidence**
 
